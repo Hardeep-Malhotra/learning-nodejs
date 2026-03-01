@@ -1,0 +1,20 @@
+{
+  "name": "learning-nodejs",
+  "version": "1.0.0",
+  "description": "learning-nodejs",
+  "main": "greeting.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hardeep-Malhotra/learning-nodejs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.6.2"
+  }
+}
