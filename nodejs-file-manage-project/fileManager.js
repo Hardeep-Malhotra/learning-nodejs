@@ -1,4 +1,4 @@
-
+#!/usr/bin/env node
 import readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import chalk from "chalk";
