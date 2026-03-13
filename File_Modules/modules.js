@@ -11,7 +11,7 @@ import getGreeting, { sayGoodbye, getTimeOfDay } from "./greeting.js";
 // ------------------------------
 // 🔹 Namespace Import Example
 // ------------------------------
-import * as system from "./systemInfo.js";
+import * as system from "../src/systemInfo.js";
 
 // ------------------------------
 // 🔹 Command Line Argument

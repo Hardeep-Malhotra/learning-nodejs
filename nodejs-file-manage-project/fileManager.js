@@ -24,6 +24,7 @@ async function menu() {
   console.log(chalk.blue.bold("\n🗃️  File System Manager CLI\n"));
 
   while (true) {
+    console.clear();
     const options = [
       "Create Folder",
       "Create File",
@@ -108,7 +109,11 @@ async function menu() {
       }
       case "7": {
         try {
-          console.log(chalk.red("⚠️  If you delete this folder, you will lose all data inside the folder!"));
+          console.log(
+            chalk.red(
+              "⚠️  If you delete this folder, you will lose all data inside the folder!",
+            ),
+          );
           const folderPath = await rl.question("Enter FolderPath: ");
           const message = await deleteFolder(folderPath);
           console.log(chalk.green(message));
