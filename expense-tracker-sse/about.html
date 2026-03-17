@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Me</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: bgMove 10s infinite alternate;
+      }
+
+      @keyframes bgMove {
+        0% {
+          background-position: left;
+        }
+        100% {
+          background-position: right;
+        }
+      }
+
+      .container {
+        text-align: center;
+        max-width: 700px;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        animation: fadeIn 2s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-size: 40px;
+        margin-bottom: 20px;
+        animation: glow 2s infinite alternate;
+      }
+
+      @keyframes glow {
+        from {
+          text-shadow: 0 0 10px #00f2ff;
+        }
+        to {
+          text-shadow: 0 0 20px #ff00ff;
+        }
+      }
+
+      p {
+        font-size: 18px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 25px;
+        background: #00f2ff;
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: #ff00ff;
+        color: #fff;
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>About This Project 🚀</h1>
+      <p>
+        This is a fully animated Node.js project page created using pure HTML
+        and CSS. It demonstrates clean UI design, smooth animations, and modern
+        styling.
+      </p>
+      <p>
+        Built by a passionate developer learning backend and publishing CLI
+        tools on npm.
+      </p>
+      <button><a href="http://localhost:3000/">Go Back Home</a></button>
+    </div>
+  </body>
+</html>
