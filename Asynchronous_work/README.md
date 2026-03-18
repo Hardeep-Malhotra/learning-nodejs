@@ -205,32 +205,36 @@ Node.js v22.0.0+ is recommended to support the latest methods like Promise.try()
 
 # ⏲️ Discover JavaScript Timers (Node.js)
 
-**Timers are essential for scheduling code execution in the future. In Node.js, timers are global functions, meaning you don't need to require('timers') to use them.**
---
+## **Timers are essential for scheduling code execution in the future. In Node.js, timers are global functions, meaning you don't need to require('timers') to use them.**
+
 ## 📌 Table of Contents
+
 `setTimeout()`
 
 `setInterval()`
 
-`setImmediate()`
---
-###  ****Recursive setTimeout vs setInterval****        
+## `setImmediate()`
+
+### \***\*Recursive setTimeout vs setInterval\*\***
+
 ---
+
 **Clear Methods**
 
 **`1. setTimeout()`**
-   Used to execute a function once after a specific delay (in milliseconds).
+Used to execute a function once after a specific delay (in milliseconds).
 
 ```JavaScript
 const timer = setTimeout((param) => {
 console.log(`Executed after 2s with param: ${param}`);
 }, 2000, "Pizza 🍕");
-Zero Delay: setTimeout(() => {}, 0) 
+Zero Delay: setTimeout(() => {}, 0)
 ```
+
 does not run immediately. It is queued to run after the current synchronous code finishes.
 
 **`2. setInterval()`**
-   Used to execute a function repeatedly at every fixed time interval.
+Used to execute a function repeatedly at every fixed time interval.
 
 ```JavaScript
 let count = 0;
@@ -240,6 +244,7 @@ console.log(`Interval Count: ${count}`);
 if (count === 5) clearInterval(interval);
 }, 1000);
 ```
+
 **` 3. setImmediate()`**
 A Node.js specific timer that runs immediately after the current Poll phase (I/O events) of the Event Loop.
 
@@ -248,9 +253,13 @@ setImmediate(() => {
 console.log("Runs after I/O events, but before setTimeout(0)");
 });
 ```
+
 ---
- ### **4. Recursive setTimeout vs setInterval**
- ---
+
+### **4. Recursive setTimeout vs setInterval**
+
+---
+
 The Problem with setInterval
 setInterval triggers the next call regardless of whether the previous execution finished. This can lead to overlapping if the task takes longer than the interval.
 
@@ -265,20 +274,23 @@ setTimeout(heavyTask, 1000);
 };
 setTimeout(heavyTask, 1000);
 ```
- ### **5. Clear Methods**
+
+### **5. Clear Methods**
+
 Every timer returns an object (in Node.js) or an ID (in Browsers) that can be used to cancel the execution.
 
 ### 🛑 Cancellation Methods
 
 In Node.js, every timer function returns an **object** (Timeout/Immediate object). You can use this object to cancel the execution before it happens.
 
-| Timer Method | Cancellation Method | Description |
-| :--- | :--- | :--- |
-| **`setTimeout()`** | `clearTimeout(timerObj)` | Stops a one-time delayed function from running. |
-| **`setInterval()`** | `clearInterval(intervalObj)` | Stops a repeating interval loop. |
+| Timer Method         | Cancellation Method            | Description                                            |
+| :------------------- | :----------------------------- | :----------------------------------------------------- |
+| **`setTimeout()`**   | `clearTimeout(timerObj)`       | Stops a one-time delayed function from running.        |
+| **`setInterval()`**  | `clearInterval(intervalObj)`   | Stops a repeating interval loop.                       |
 | **`setImmediate()`** | `clearImmediate(immediateObj)` | Cancels a "VIP" immediate task before the Check phase. |
 
 #### Example:
+
 ```javascript
 const myTimer = setTimeout(() => {
   console.log("This will not run!");
@@ -289,11 +301,123 @@ clearTimeout(myTimer);
 ```
 
 ### 🚀 Execution Summary Table
+
 This table shows exactly **when** each timer runs in the Node.js Event Loop:
 
-| Method | Execution | Event Loop Phase | Priority |
-| :--- | :--- | :--- | :--- |
-| **`process.nextTick()`** | Instant | Before the next phase | **Highest (Immediate)** |
-| **`setImmediate()`** | Once | Check Phase | **High (After I/O)** |
-| **`setTimeout()`** | Once | Timers Phase | **Medium (Delayed)** |
-| **`setInterval()`** | Repeated | Timers Phase | **Medium (Repeated)** |
+| Method                   | Execution | Event Loop Phase      | Priority                |
+| :----------------------- | :-------- | :-------------------- | :---------------------- |
+| **`process.nextTick()`** | Instant   | Before the next phase | **Highest (Immediate)** |
+| **`setImmediate()`**     | Once      | Check Phase           | **High (After I/O)**    |
+| **`setTimeout()`**       | Once      | Timers Phase          | **Medium (Delayed)**    |
+| **`setInterval()`**      | Repeated  | Timers Phase          | **Medium (Repeated)**   |
+
+---
+
+# 📖 Node.js: Blocking vs. Non-Blocking I/O
+
+## _Understanding the difference between Blocking and Non-Blocking is the key to mastering Node.js performance. Node.js is single-threaded, but it handles high concurrency using the Event Loop and Libuv._
+
+## 1. What is Blocking (Synchronous)? 🛑
+
+Blocking refers to operations that stop the execution of additional JavaScript until the current operation finishes. The Event Loop cannot continue while a blocking operation is occurring.
+
+Naming Convention: Usually ends with Sync (e.g., readFileSync, writeFileSync).
+
+Best For: Initial application setup, such as loading environment variables or configuration files.
+
+## `Risk:` If used in a web server, one heavy request can "freeze" the server for all other users.
+
+### 💻 Synchronous Example:
+
+---
+
+```JavaScript
+const fs = require('node:fs');
+
+console.log("1. Task Start");
+const data = fs.readFileSync('file.txt', 'utf8'); // Blocks here
+console.log("2. Data:", data);
+console.log("3. Next Task");
+
+// Output Order: 1 -> 2 -> 3
+```
+
+---
+
+## 2. What is Non-Blocking (Asynchronous)? ⚡
+
+`
+Non-Blocking allows Node.js to start an I/O operation (like reading a file or database) and move to the next task immediately. Once the I/O is done, a callback is executed.
+
+Mechanism: Offloads I/O tasks to Libuv (C++ Thread Pool).
+
+`Best For:` Real-time applications, APIs, and handling thousands of concurrent users.
+
+## `Benefit: `High Throughput (more work done in less time).
+
+### 💻 Asynchronous Example:
+
+---
+
+```JavaScript
+const fs = require('node:fs');
+
+console.log("1. Task Start");
+fs.readFile('file.txt', 'utf8', (err, data) => {
+    if (err) throw err;
+    console.log("3. Data:", data); // Executes later
+});
+console.log("2. Next Task");
+
+// Output Order: 1 -> 2 -> 3 (Task 2 runs while file is reading)
+```
+
+## 📊 Comparison Table: Blocking vs Non-Blocking
+
+| Feature             | Blocking (Synchronous) 🛑 | Non-Blocking (Asynchronous) ⚡ |
+| ------------------- | ------------------------- | ------------------------------ |
+| Priority / Nature   | Sequential (One by one)   | Concurrent (Parallel-like)     |
+| Execution Flow      | Direct Line Flow          | Event Loop                     |
+| Thread State        | Paused / Stuck (Frozen)   | Always Free & Running          |
+| Processing          | Handled by Main Thread    | Offloaded to Libuv             |
+| Performance         | Low Throughput (Slow)     | High Throughput (Fast)         |
+| Resource Efficiency | Less Efficient            | More Efficient                 |
+| I/O Handling        | Done by Main Thread       | Worker Pool / System Level I/O |
+| Naming Convention   | Methods end with `Sync`   | Uses Callbacks / Promises      |
+| Standard Pattern    | Simple & Linear           | Event-driven                   |
+| Best Use Case       | Startup / Config Loading  | APIs / Servers / Real-time     |
+| Production Ready    | Limited Use               | Highly Recommended             |
+
+---
+
+### ⚠️ The Danger Zone: Mixing Both
+
+---
+
+Never perform a Blocking operation after starting a Non-Blocking one on the same resource.
+
+\***\*Bad Practice:\*\***
+
+```JavaScript
+fs.readFile('file.txt', (err, data) => { /* read */ });
+fs.unlinkSync('file.txt'); // ❌ ERROR: Might delete before reading is finished!
+```
+
+\***\*Good Practice (Chaining):\*\***
+
+```JavaScript
+fs.readFile('file.txt', (err, data) => {
+    fs.unlink('file.txt', (err) => { /* delete after read */ });
+});
+
+```
+
+---
+
+### 💡 Interviewer's Secret: CPU vs I/O
+
+---
+
+I/O Tasks (File, Network) are handled by Libuv threads. Node.js is great here.
+
+CPU Tasks (Heavy Math, Image Processing) stay on the Main Thread. If you run a heavy loop, Node.js will still block even if you use "Async" syntax.
