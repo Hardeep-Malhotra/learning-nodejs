@@ -200,3 +200,100 @@ Synchronous Code (Highest Priority)
 ## 🚀 Environment Requirements
 
 Node.js v22.0.0+ is recommended to support the latest methods like Promise.try() and Promise.withResolvers().
+
+---
+
+# ⏲️ Discover JavaScript Timers (Node.js)
+
+**Timers are essential for scheduling code execution in the future. In Node.js, timers are global functions, meaning you don't need to require('timers') to use them.**
+--
+## 📌 Table of Contents
+`setTimeout()`
+
+`setInterval()`
+
+`setImmediate()`
+--
+###  ****Recursive setTimeout vs setInterval****        
+---
+**Clear Methods**
+
+**`1. setTimeout()`**
+   Used to execute a function once after a specific delay (in milliseconds).
+
+```JavaScript
+const timer = setTimeout((param) => {
+console.log(`Executed after 2s with param: ${param}`);
+}, 2000, "Pizza 🍕");
+Zero Delay: setTimeout(() => {}, 0) 
+```
+does not run immediately. It is queued to run after the current synchronous code finishes.
+
+**`2. setInterval()`**
+   Used to execute a function repeatedly at every fixed time interval.
+
+```JavaScript
+let count = 0;
+const interval = setInterval(() => {
+count++;
+console.log(`Interval Count: ${count}`);
+if (count === 5) clearInterval(interval);
+}, 1000);
+```
+**` 3. setImmediate()`**
+A Node.js specific timer that runs immediately after the current Poll phase (I/O events) of the Event Loop.
+
+```JavaScript
+setImmediate(() => {
+console.log("Runs after I/O events, but before setTimeout(0)");
+});
+```
+---
+ ### **4. Recursive setTimeout vs setInterval**
+ ---
+The Problem with setInterval
+setInterval triggers the next call regardless of whether the previous execution finished. This can lead to overlapping if the task takes longer than the interval.
+
+The Solution: Recursive setTimeout
+This pattern guarantees a fixed delay between executions because the next timer is only scheduled after the current task completes.
+
+```JavaScript
+const heavyTask = () => {
+// Do some heavy work...
+setTimeout(heavyTask, 1000);
+// Schedule NEXT only when THIS is done
+};
+setTimeout(heavyTask, 1000);
+```
+ ### **5. Clear Methods**
+Every timer returns an object (in Node.js) or an ID (in Browsers) that can be used to cancel the execution.
+
+### 🛑 Cancellation Methods
+
+In Node.js, every timer function returns an **object** (Timeout/Immediate object). You can use this object to cancel the execution before it happens.
+
+| Timer Method | Cancellation Method | Description |
+| :--- | :--- | :--- |
+| **`setTimeout()`** | `clearTimeout(timerObj)` | Stops a one-time delayed function from running. |
+| **`setInterval()`** | `clearInterval(intervalObj)` | Stops a repeating interval loop. |
+| **`setImmediate()`** | `clearImmediate(immediateObj)` | Cancels a "VIP" immediate task before the Check phase. |
+
+#### Example:
+```javascript
+const myTimer = setTimeout(() => {
+  console.log("This will not run!");
+}, 5000);
+
+// Decided to cancel it
+clearTimeout(myTimer);
+```
+
+### 🚀 Execution Summary Table
+This table shows exactly **when** each timer runs in the Node.js Event Loop:
+
+| Method | Execution | Event Loop Phase | Priority |
+| :--- | :--- | :--- | :--- |
+| **`process.nextTick()`** | Instant | Before the next phase | **Highest (Immediate)** |
+| **`setImmediate()`** | Once | Check Phase | **High (After I/O)** |
+| **`setTimeout()`** | Once | Timers Phase | **Medium (Delayed)** |
+| **`setInterval()`** | Repeated | Timers Phase | **Medium (Repeated)** |
