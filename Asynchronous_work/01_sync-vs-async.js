@@ -38,11 +38,33 @@ Promise.resolve().then(() => {
   console.log("Promise Microtask");
 });
 
-// ------------------------------------------------
-// 🔹 process.nextTick (Highest Priority)
-// ------------------------------------------------
-// nextTick runs before Promises in Node.js.
 
+/**
+ * 🚀 TOPIC: Understanding process.nextTick()
+ * -----------------------------------------
+ * Concept: "Tick" ka matlab hai jab JS engine ek operation khatam karke agle par jata hai.
+ * process.nextTick() -> Ye loop ke agle phase par jane se PEHLE hi execute ho jata hai.
+ */
+
+console.log("--- 🏁 Start of Script ---");
+
+// 1. setTimeout (Minimum 0ms delay)
+setTimeout(() => {
+    console.log("⏰ setTimeout: Agle 'Tick' ke end mein chalunga.");
+}, 0);
+
+// 2. process.nextTick (Emergency Priority)
 process.nextTick(() => {
-  console.log("Next Tick");
+    console.log("🚀 process.nextTick: Sabse pehle main! (Before next phase)");
 });
+
+// 3. Normal Synchronous Task
+console.log("📝 Normal Task: Main toh line-by-line chalta hoon.");
+
+/**
+ * 🤔 LOGIC KYA HAI?
+ * nextTick() engine ko bolta hai: "Bhai, current kaam khatam hote hi, 
+ * aur loop ke agle phase par jane se PEHLE, mera ye kaam nipta dena."
+ */
+
+console.log("--- 🏁 End of Script ---");
