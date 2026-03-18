@@ -423,11 +423,13 @@ I/O Tasks (File, Network) are handled by Libuv threads. Node.js is great here.
 CPU Tasks (Heavy Math, Image Processing) stay on the Main Thread. If you run a heavy loop, Node.js will still block even if you use "Async" syntax.
 
 ---
+
 # 🎡 Node.js Event Loop: Deep Dive
 
 The **Event Loop** allows Node.js to perform **non-blocking I/O operations** (like file reading or network requests) even though JavaScript is single-threaded.
 
 👉 It offloads heavy tasks to:
+
 - **System Kernel**
 - **Libuv Thread Pool**
 
@@ -438,14 +440,14 @@ The **Event Loop** allows Node.js to perform **non-blocking I/O operations** (li
 Each cycle of the event loop is called a **"Tick"**.  
 In every tick, Node.js follows a fixed order:
 
-| Phase | Description | Key Methods |
-|------|------------|-------------|
-| **Timers** | Executes callbacks from expired timers | `setTimeout()`, `setInterval()` |
-| **Pending** | Executes I/O callbacks deferred from previous loop | System Errors (e.g., TCP) |
-| **Idle / Prepare** | Used internally by Node.js | Internal Only |
-| **Poll** | Retrieves new I/O events and executes I/O callbacks | `fs.readFile()`, `http.get()` |
-| **Check** | Executes callbacks immediately after Poll phase | `setImmediate()` |
-| **Close** | Executes callbacks for closed connections/handles | `socket.on('close')` |
+| Phase              | Description                                         | Key Methods                     |
+| ------------------ | --------------------------------------------------- | ------------------------------- |
+| **Timers**         | Executes callbacks from expired timers              | `setTimeout()`, `setInterval()` |
+| **Pending**        | Executes I/O callbacks deferred from previous loop  | System Errors (e.g., TCP)       |
+| **Idle / Prepare** | Used internally by Node.js                          | Internal Only                   |
+| **Poll**           | Retrieves new I/O events and executes I/O callbacks | `fs.readFile()`, `http.get()`   |
+| **Check**          | Executes callbacks immediately after Poll phase     | `setImmediate()`                |
+| **Close**          | Executes callbacks for closed connections/handles   | `socket.on('close')`            |
 
 ---
 
@@ -458,26 +460,28 @@ It runs **immediately after the current operation**, before moving to the next p
 
 ### 🔥 Priority Comparison
 
-| Method | Execution Logic | Priority |
-|--------|---------------|----------|
-| `process.nextTick()` | Runs right after current operation | ⭐ Highest (VVIP) |
-| `setImmediate()` | Runs in Check Phase (after Poll) | High (Post-I/O) |
-| `setTimeout(0)` | Runs in Timers Phase | Medium (Scheduled) |
+| Method               | Execution Logic                    | Priority           |
+| -------------------- | ---------------------------------- | ------------------ |
+| `process.nextTick()` | Runs right after current operation | ⭐ Highest (VVIP)  |
+| `setImmediate()`     | Runs in Check Phase (after Poll)   | High (Post-I/O)    |
+| `setTimeout(0)`      | Runs in Timers Phase               | Medium (Scheduled) |
 
 ---
 
 ## 🧪 Practical Example: Execution Order
 
 ```javascript
-const fs = require('fs');
+const fs = require("fs");
 
-fs.readFile('file.txt', () => {
-    setTimeout(() => console.log('3. Timeout'), 0);
-    setImmediate(() => console.log('2. Immediate'));
-    process.nextTick(() => console.log('1. NextTick'));
+fs.readFile("file.txt", () => {
+  setTimeout(() => console.log("3. Timeout"), 0);
+  setImmediate(() => console.log("2. Immediate"));
+  process.nextTick(() => console.log("1. NextTick"));
 });
 ```
+
 **✅ Expected Output**
+
 1. NextTick
 2. Immediate
 3. Timeout
@@ -500,8 +504,8 @@ Comes right after Poll (where I/O happens)
 
 Executes in Timers Phase
 
-Runs in the next loop iteration
----
+## Runs in the next loop iteration
+
 ## ⚠️ Important Warning: I/O Starvation
 
 Using process.nextTick() recursively can block the event loop.
@@ -511,7 +515,7 @@ Using process.nextTick() recursively can block the event loop.
 👉 I/O operations (file, network) will stop
 
 🚨 Your app may become unresponsive
-**
+\*\*
 **🧠 Rule of Thumb**
 
 ✔ Use setImmediate() in most cases
@@ -528,3 +532,76 @@ Microtasks (nextTick) have higher priority than phases
 Avoid overusing nextTick() to prevent performance issues
 
 ---
+
+# **📡 Node.js: EventEmitter (Custom Events)**
+
+The EventEmitter is a core Node.js module that allows objects to communicate with each other. It follows the Observer Pattern, where one object (Emitter) "broadcasts" a message and others (Listeners) "react" to it.
+
+---
+
+# **🛠️ Core Concepts: Emit vs On**
+
+In Node.js, interaction on the backend is handled through events using the events module.
+
+| Method    | Action      | Simple Meaning                                           |
+| --------- | ----------- | -------------------------------------------------------- |
+| `.on()`   | Listen      | "Whenever this event happens, run this function."        |
+| `.once()` | Listen Once | "Run this function only the first time, then forget it." |
+| `.emit()` | Trigger     | "The event happened! Notify all listeners."              |
+| `.off()`  | Remove      | "Stop listening to this event."                          |
+
+---
+
+# **🔄 How it Works (Visual Logic)**
+
+`Initialize:` Create an instance of EventEmitter.
+
+`Subscribe:` Use **`.on()`** to define what happens when an event occurs.
+
+`Publish:` Use **`.emit()`** to trigger the event and pass data
+
+---
+
+## **💻 Practical Code Examples**
+
+**_1. Basic Event with Arguments_**
+
+```JavaScript
+const EventEmitter = require('node:events');
+const myEmitter = new EventEmitter();
+
+// Setup Listener
+myEmitter.on('login', (user) => {
+    console.log(`${user} logged into the system.`);
+});
+
+// Trigger Event
+myEmitter.emit('login', 'Hardeep');
+```
+
+**_2. The once() vs on() Difference_**
+
+```JavaScript
+// This will run EVERY time 'update' is emitted
+myEmitter.on('update', () => console.log('Continuous Update...'));
+
+// This will run ONLY the first time 'init' is emitted
+myEmitter.once('init', () => console.log('System Initialized!'));
+```
+
+## 📊 Comparison Table: Event Methods (Box Version)
+
+| Feature     | `.on()`                   | `.once()`                  | `.off()`                |
+| ----------- | ------------------------- | -------------------------- | ----------------------- |
+| Persistence | Permanent (until removed) | Temporary (self-destructs) | Removes listener        |
+| Usage Limit | Multiple times            | Exactly once               | Stops further execution |
+| Priority    | Regular flow              | Regular flow               | Management / cleanup    |
+| Best For    | Chat, Logs, Requests      | DB connect, Setup, Welcome | Memory management       |
+
+---
+
+## **⚠️ Always remember:**
+
+If you add too many `.on()` listeners and don’t remove them using `.off()`, they will keep consuming memory.
+
+👉 Use `.removeAllListeners()` to clean up everything once the task is finished.
