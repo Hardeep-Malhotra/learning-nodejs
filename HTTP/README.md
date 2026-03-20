@@ -75,8 +75,11 @@ Request Errors: Can happen if the client disconnects abruptly.
 **Rule of Thumb:** Always attach an .on('error', ...) listener to both the request and response objects.
 
 ```js
-request.on('error', err => { console.error(err); });
+request.on("error", (err) => {
+  console.error(err);
+});
 ```
+
 ---
 
 ## **5. Routing: The Logic Gate**
@@ -86,8 +89,9 @@ Routing is the process of mapping a specific URL + Method combination to a speci
 **Static Routing:** Exact matches (e.g., if (url === '/about')).
 
 **Dynamic Routing:** Using regex or parameters (usually handled by frameworks like Express).
+
 ```js
-if (request.method === 'GET' && request.url === '/home') // handle route 
+if (request.method === 'GET' && request.url === '/home') // handle route
 ```
 
 ---
@@ -116,10 +120,10 @@ In the HTTP protocol, the "Envelope" (Status and Headers) must be sent before th
 
 `res.write():` Can be called multiple times to send chunks of data to the client (Progressive loading).
 
-`res.end():` Signals to the server and the client that the response is complete. Every request must call res.end(), otherwise, the browser will hang forever.
----
+## `res.end():` Signals to the server and the client that the response is complete. Every request must call res.end(), otherwise, the browser will hang forever.
 
 ## **8. The Power of pipe()**
+
 The **pipe()** method is the most efficient way to move data from a source (Request) to a destination (Response).
 
 ```JavaScript
@@ -127,6 +131,7 @@ The **pipe()** method is the most efficient way to move data from a source (Requ
 request.pipe(response);
 What pipe() does for you:
 ```
+
 Listens for 'data' and writes it to the response.
 
 Handles Backpressure (pausing the read if the write is too slow).
@@ -134,6 +139,7 @@ Handles Backpressure (pausing the read if the write is too slow).
 Automatically calls res.end() when the request stream finishes.
 
 ---
+
 ## 🧠 Key Concepts
 
 | Concept      | Meaning              |
@@ -143,3 +149,165 @@ Automatically calls res.end() when the request stream finishes.
 | EventEmitter | Handles events       |
 | pipe()       | Direct data transfer |
 | Routing      | URL-based logic      |
+
+---
+
+# **🌐 Enterprise Network Configuration in Node.js**
+
+## This guide explains how to configure Node.js applications to operate effectively within restricted corporate environments, handling Proxies and Custom Certificate Authorities (CAs).
+
+## **📑 Table of Contents**
+
+Overview
+
+Proxy Configuration
+
+Environment Variables
+
+Command Line Flags
+
+Programmatic Setup
+
+Proxy Bypass (NO_PROXY)
+
+Certificate Authority (CA) Configuration
+
+System CA Trust
+
+Extra CA Certificates
+
+Programmatic CA Management
+
+Summary Table
+
+---
+
+## **🏛️ Overview**
+
+In enterprise settings, applications don't have direct internet access. They must navigate:
+
+**Corporate Proxies:** Middleman servers for security and monitoring.
+
+**Private CAs:** Internal SSL/TLS certificates that Node.js doesn't trust by default.
+
+**Node.js (v22.21.0+ and v24+)** now provides built-in support to handle these without third-party libraries like https-proxy-agent.
+
+---
+
+## **🔌 Proxy Configuration**
+
+### **🌍 Environment Variables**
+
+Node.js can automatically pick up system proxy settings if enabled.
+
+Setup (POSIX/Bash):
+
+```Bash
+export HTTP_PROXY=http://proxy.company.com:8080
+export HTTPS_PROXY=http://proxy.company.com:8080
+export NODE_USE_ENV_PROXY=1
+```
+
+`node app.js`
+
+🚩 Command Line Flags
+Alternatively, enable it per execution:
+
+```Bash
+node --use-env-proxy app.js
+```
+
+💻 Programmatic Setup (Code Level)
+If you need specific proxies for specific requests, use the agent option:
+
+```JavaScript
+const https = require('node:https');
+
+const agent = new https.Agent({
+  proxyEnv: { HTTPS_PROXY: 'http://username:password@proxy.company.com:8080' },
+});
+https.request({ hostname: 'external.com', agent }, (res) => { ... });
+```
+
+---
+
+### **🚫 Proxy Bypass (NO_PROXY)**
+
+---
+
+Use `NO_PROXY` to define addresses that should not go through the proxy (e.g., internal tools or localhost).
+
+| Syntax          | Description                                                      | Example Match                        |
+| --------------- | ---------------------------------------------------------------- | ------------------------------------ |
+| \*              | Bypass everything. No proxy will be used for any host.           | google.com, internal.sitecompany.com |
+| google.com      | Exact hostname. Only this specific domain will be bypassed.      | google.com                           |
+| .company.com    | Domain suffix. All subdomains of this domain will be bypassed.   | api.company.com, mail.company.com    |
+| \*.company.com  | Wildcard match. Same as suffix match, applies to all subdomains. | dev.company.com                      |
+| 192.168.1.1     | Exact IP address. Only this specific IP will be bypassed.        | 192.168.1.1                          |
+| 192.168.1.1-100 | IP range. All IPs within this range will be bypassed.            | 192.168.1.50                         |
+| localhost       | Local machine. Requests to your own computer.                    | 127.0.0.1, localhost                 |
+
+---
+
+## **🔐 Certificate Authority (CA) Configuration**
+
+By default, Node.js uses its own bundled root CAs. Corporate "Self-signed" certificates will trigger the error:
+Error: self signed certificate in certificate chain
+
+---
+
+## **🛡️ System CA Trust**
+
+Trust certificates already installed in your OS (Windows Cert Store / macOS Keychain):
+
+---
+
+# Environment Variable
+
+NODE_USE_SYSTEM_CA=1 node app.js
+
+---
+
+# Flag
+
+node --use-system-ca app.js
+
+## **📁 Extra CA Certificates**
+
+If you have a specific .pem file from your IT department:
+
+```Bash
+export NODE_EXTRA_CA_CERTS=/path/to/company-ca-bundle.pem
+node app.js
+```
+
+## **⚙️ Programmatic CA Management**
+
+You can merge system certificates with Node's defaults in your code:
+
+```JavaScript
+const tls = require('node:tls');
+const currentCerts = tls.getCACertificates('default');
+const systemCerts = tls.getCACertificates('system');
+
+tls.setDefaultCACertificates([...currentCerts, ...systemCerts]);
+```
+
+---
+
+## 📊 Summary Table
+
+| Requirement      | Variable / Flag      | Purpose                                                             |
+| ---------------- | -------------------- | ------------------------------------------------------------------- |
+| Use Proxy        | NODE_USE_ENV_PROXY=1 | Route traffic through `HTTP_PROXY`.                                 |
+| Trust OS Store   | --use-system-ca      | Fix "Self-signed certificate" errors using OS trusted certificates. |
+| Bypass Proxy     | NO_PROXY             | Direct connection for internal/local hosts (skip proxy).            |
+| Custom Cert File | NODE_EXTRA_CA_CERTS  | Load additional `.pem` certificate files.                           |
+
+---
+
+#### **🚀 Key Takeaway**
+
+---
+
+When working in a corporate environment, Node.js v22+ makes life easier by allowing system-wide proxy and certificate integration without extra dependencies.
