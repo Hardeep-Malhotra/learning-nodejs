@@ -1,4 +1,4 @@
-# 📦 Node.js File Stats
+#  **1.📦 Node.js File Stats**
 
 ## 📌 Introduction
 
@@ -178,9 +178,10 @@ node-file-module-system/
 
 ## 🔥 Now you are ready to use Node.js File Stats like a pro!
 
-# 📦 Node.js File Paths
+# **2.📦 Node.js File Paths**
 
 ## 📌 Introduction
+
 
 Every file in a system has a **path**.
 
@@ -413,3 +414,189 @@ path.join('/users', name, 'file.txt') ✅
 ---
 
 🔥 Now you can handle file paths like a pro in Node.js!
+
+---
+#  3.📦 Node.js Reading Files with Node.js
+
+This guide explains different ways to read files in Node.js using the built-in **fs (File System)** module.
+
+---
+
+## 🚀 Methods Covered
+
+1. fs.readFile() (Asynchronous - Callback)
+2. fs.readFileSync() (Synchronous)
+3. fsPromises.readFile() (Promise-based)
+4. Streams (For large files)
+
+---
+
+# 🔥 1. fs.readFile() (Async - Callback)
+
+The simplest way to read a file in Node.js is using `fs.readFile()`.
+
+```js
+const fs = require('node:fs');
+
+fs.readFile('/Users/joe/test.txt', 'utf8', (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log(data);
+});
+```
+**📌 Explanation:**
+
+Asynchronous (non-blocking)
+
+Uses a callback function
+
+Does not stop execution of other code
+
+---
+
+# ⚡ 2. fs.readFileSync() (Sync - Blocking)
+
+You can also read files synchronously using fs.readFileSync().
+
+```js
+const fs = require('node:fs');
+
+try {
+  const data = fs.readFileSync('/Users/joe/test.txt', 'utf8');
+  console.log(data);
+} catch (err) {
+  console.error(err);
+}
+```
+**📌 Explanation:**
+
+Synchronous (blocking)
+
+Stops execution until file is read
+
+---
+
+# 🚀 3. fsPromises.readFile() (Promise-based)
+
+Modern approach using Promises and async/await.
+
+```js
+const fs = require('node:fs/promises');
+
+async function example() {
+  try {
+    const data = await fs.readFile('/Users/joe/test.txt', { encoding: 'utf8' });
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+}
+```
+example();
+**📌 Explanation:**
+
+Uses async/await
+
+Cleaner and more readable
+
+Recommended for modern applications
+
+---
+
+**⚠️ Important Note**
+
+All three methods:
+
+`fs.readFile()`
+
+`fs.readFileSync()`
+
+`fsPromises.readFile()`
+
+
+**👉 Load the entire file into memory.**
+
+❌ Problem:
+
+High memory usage
+
+Slow performance for large files
+
+---
+
+# 🌊 4. Streams (Best for Large Files)
+
+For large files, use streams to read data in chunks.
+
+📥 Example: Download + Read File Using Streams
+
+```js
+import fs from 'fs';
+import { pipeline } from 'node:stream/promises';
+import path from 'path';
+
+const fileUrl = 'https://www.gutenberg.org/files/2701/2701-0.txt';
+const outputFilePath = path.join(process.cwd(), 'moby.md');
+
+async function downloadFile(url, outputPath) {
+  const response = await fetch(url);
+
+  if (!response.ok || !response.body) {
+    await response.body?.cancel();
+    throw new Error(`Failed to fetch ${url}. Status: ${response.status}`);
+  }
+
+  const fileStream = fs.createWriteStream(outputPath);
+
+  console.log(`Downloading file from ${url} to ${outputPath}`);
+
+  await pipeline(response.body, fileStream);
+
+  console.log('File downloaded successfully');
+}
+
+async function readFile(filePath) {
+  const readStream = fs.createReadStream(filePath, { encoding: 'utf8' });
+
+  try {
+    for await (const chunk of readStream) {
+      console.log('--- File chunk start ---');
+      console.log(chunk);
+      console.log('--- File chunk end ---');
+    }
+
+    console.log('Finished reading the file.');
+  } catch (error) {
+    console.error(`Error reading file: ${error.message}`);
+  }
+}
+
+try {
+  await downloadFile(fileUrl, outputFilePath);
+  await readFile(outputFilePath);
+} catch (error) {
+  console.error(`Error: ${error.message}`);
+}
+
+```
+**📌 Explanation:**
+
+Uses streams to handle large files
+
+Reads file in chunks instead of loading full file
+
+Efficient and memory-friendly
+
+---
+
+## 🧠 Summary
+
+| Method                 | Type             | Best Use           |
+|----------------------|------------------|--------------------|
+| fs.readFile          | Async            | General use        |
+| fs.readFileSync      | Sync             | Small scripts      |
+| fsPromises.readFile  | Async (Modern)   | Production apps    |
+| Streams              | Chunk-based      | Large files        |
+---
