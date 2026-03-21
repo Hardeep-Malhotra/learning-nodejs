@@ -176,4 +176,240 @@ node-file-module-system/
 
 ---
 
-🔥 Now you are ready to use Node.js File Stats like a pro!
+## 🔥 Now you are ready to use Node.js File Stats like a pro!
+
+# 📦 Node.js File Paths
+
+## 📌 Introduction
+
+Every file in a system has a **path**.
+
+A path tells us **where a file is located** in the system.
+
+👉 Example:
+
+- Linux / macOS → `/users/joe/file.txt`
+- Windows → `C:\users\joe\file.txt`
+
+Because paths are different on different operating systems, Node.js provides a **built-in module called `path`** to handle them safely.
+
+---
+
+## 📥 Importing Path Module
+
+```js
+const path = require("node:path");
+```
+
+---
+
+## 🧠 Why Use Path Module?
+
+- Avoid OS-related path issues
+- Work with file paths safely
+- Extract useful information from paths
+- Create dynamic file paths
+
+---
+
+## 📊 Getting Information from a Path
+
+### Example Path:
+
+```js
+const filePath = "/users/joe/notes.txt";
+```
+
+---
+
+### 🔹 1. `path.dirname()`
+
+👉 Gets the folder (directory) name
+
+```js
+path.dirname(filePath);
+// Output: /users/joe
+```
+
+---
+
+### 🔹 2. `path.basename()`
+
+👉 Gets the file name
+
+```js
+path.basename(filePath);
+// Output: notes.txt
+```
+
+---
+
+### 🔹 3. `path.extname()`
+
+👉 Gets the file extension
+
+```js
+path.extname(filePath);
+// Output: .txt
+```
+
+---
+
+### 🔹 Get filename without extension
+
+```js
+path.basename(filePath, path.extname(filePath));
+// Output: notes
+```
+
+---
+
+## ⚡ Working with Paths
+
+### 🔹 4. `path.join()`
+
+👉 Joins multiple parts into a single path
+
+```js
+const fullPath = path.join("/", "users", "joe", "notes.txt");
+
+console.log(fullPath);
+// Output: /users/joe/notes.txt
+```
+
+📌 Automatically handles slashes correctly
+
+---
+
+### 🔹 5. `path.resolve()`
+
+👉 Converts relative path to absolute path
+
+```js
+path.resolve("notes.txt");
+// Output: /current/folder/notes.txt
+```
+
+---
+
+### 🔹 Multiple arguments
+
+```js
+path.resolve("tmp", "notes.txt");
+// Output: /current/folder/tmp/notes.txt
+```
+
+---
+
+### 🔹 Absolute path case
+
+```js
+path.resolve("/etc", "notes.txt");
+// Output: /etc/notes.txt
+```
+
+---
+
+### 🔹 6. `path.normalize()`
+
+👉 Cleans up messy paths
+
+```js
+path.normalize("/users/joe/..//test.txt");
+// Output: /users/test.txt
+```
+
+---
+
+## ⚠️ Important Note
+
+❗ `resolve()` and `normalize()`:
+
+- Do NOT check if the file exists
+- Only calculate the path
+
+---
+
+## 📊 Summary Table
+
+| Method        | Description       |
+| ------------- | ----------------- |
+| `dirname()`   | Get folder path   |
+| `basename()`  | Get file name     |
+| `extname()`   | Get extension     |
+| `join()`      | Join paths safely |
+| `resolve()`   | Get absolute path |
+| `normalize()` | Clean path        |
+
+---
+
+## 🎯 Real-World Use Cases
+
+- Creating file upload paths
+- Building file systems
+- Working with dynamic file locations
+- Avoiding OS-specific bugs
+
+---
+
+## 📁 Example Code
+
+```js
+const path = require("node:path");
+
+const filePath = "/users/joe/notes.txt";
+
+console.log("Directory:", path.dirname(filePath));
+console.log("File Name:", path.basename(filePath));
+console.log("Extension:", path.extname(filePath));
+
+const fullPath = path.join("/users", "joe", "docs", "file.txt");
+console.log("Joined Path:", fullPath);
+
+const absolutePath = path.resolve("file.txt");
+console.log("Absolute Path:", absolutePath);
+
+const cleanPath = path.normalize("/users/joe/..//test.txt");
+console.log("Normalized Path:", cleanPath);
+```
+
+---
+
+## 🚀 Conclusion
+
+The `path` module helps developers work with file paths safely and efficiently across different operating systems.
+
+👉 Always use `path.join()` instead of manually adding `/`
+👉 Use `resolve()` for absolute paths
+👉 Use `normalize()` to clean paths
+
+---
+
+## 📁 Suggested File Structure
+
+```bash
+node-file-module-system/
+│
+├── 02-file-paths.js
+├── README.md
+```
+
+---
+
+## 💡 Pro Tip
+
+👉 Never write paths manually like:
+
+```js
+'/users/' + name + '/file.txt' ❌
+```
+
+👉 Always use:
+
+```js
+path.join('/users', name, 'file.txt') ✅
+```
+
+---
+
+🔥 Now you can handle file paths like a pro in Node.js!
