@@ -2,20 +2,20 @@
 // 🔥 1. fs.readFile() (Async Method)
 // ================================
 
-// const fs = require("fs");
+const fs = require("fs");
 
-// console.log("1 run");
+console.log("1 run");
 
-// fs.readFile("node-file-module-system/test.txt", "utf-8", (err, data) => {
-//   if (err) {
-//     console.log("Error:", err);
-//     return;
-//   }
+fs.readFile("node-file-module-system/test.txt", "utf-8", (err, data) => {
+  if (err) {
+    console.log("Error:", err);
+    return;
+  }
 
-//   console.log("2 run (File Data):", data);
-// });
+  console.log("2 run (File Data):", data);
+});
 
-// console.log("3 run");
+console.log("3 run");
 
 // Output:
 // 1
@@ -26,22 +26,22 @@
 // ⚡ 2. fs.readFileSync() (Sync Method)
 // ================================
 
-// const fs = require("fs");
+const fs = require("fs");
 
-// console.log("1 run");
+console.log("1 run");
 
-// try {
-//   const fileData = fs.readFileSync(
-//     "node-file-module-system/test.txt",
-//     "utf-8"
-//   );
+try {
+  const fileData = fs.readFileSync(
+    "node-file-module-system/test.txt",
+    "utf-8"
+  );
 
-//   console.log("2 run (File Data):", fileData);
-// } catch (error) {
-//   console.log("Error:", error);
-// }
+  console.log("2 run (File Data):", fileData);
+} catch (error) {
+  console.log("Error:", error);
+}
 
-// console.log("3 run");
+console.log("3 run");
 
 // Output:
 // 1
@@ -52,24 +52,24 @@
 // 🚀 3. fsPromises.readFile() (Modern Way)
 // ================================
 
-// const fs = require("fs/promises");
+const fs = require("fs/promises");
 
-// console.log("1 run");
+console.log("1 run");
 
-// async function readFileAsync() {
-//   try {
-//     const data = await fs.readFile(
-//       "node-file-module-system/test.txt",
-//       "utf-8"
-//     );
+async function readFileAsync() {
+  try {
+    const data = await fs.readFile(
+      "node-file-module-system/test.txt",
+      "utf-8"
+    );
 
-//     console.log("2 run (File Data):", data);
-//   } catch (err) {
-//     console.log("Error:", err);
-//   }
-// }
+    console.log("2 run (File Data):", data);
+  } catch (err) {
+    console.log("Error:", err);
+  }
+}
 
-// readFileAsync();
+readFileAsync();
 
 // console.log("3 run");
 
