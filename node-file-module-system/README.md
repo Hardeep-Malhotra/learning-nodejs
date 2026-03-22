@@ -600,3 +600,161 @@ Efficient and memory-friendly
 | fsPromises.readFile  | Async (Modern)   | Production apps    |
 | Streams              | Chunk-based      | Large files        |
 ---
+# 4.✍️ Node.js File System (fs) - Writing Files (In-Depth Guide)
+
+This project provides a detailed explanation of how to write and append data to files in Node.js using the built-in **fs (File System)** module.
+
+---
+
+# 📚 Introduction to File System (fs)
+
+Node.js provides a core module called **fs (File System)** that allows interaction with the file system of the operating system.
+
+Using this module, we can:
+- Create files
+- Read files
+- Write data to files
+- Append data
+- Delete files
+
+👉 It is one of the most important modules in Node.js backend development.
+
+---
+
+# ✍️ Writing Files in Node.js
+
+Writing a file means storing data into a file. Node.js provides multiple methods to perform this operation.
+
+---
+
+# 🔥 1. fs.writeFile() (Asynchronous Method)
+
+## 📌 Theory
+
+- `fs.writeFile()` is an **asynchronous (non-blocking)** function.
+- It writes data to a file **without blocking the execution** of other code.
+- It uses a **callback function** to handle success or error.
+
+👉 Node.js continues executing the next lines of code while writing happens in the background.
+
+---
+
+## ⚙️ Working
+
+1. File path is provided
+2. Data is passed
+3. Node.js sends request to OS
+4. Callback is executed after completion
+
+---
+
+## 📌 Behavior
+
+- If file exists → content is **overwritten**
+- If file does not exist → new file is **created**
+
+---
+
+## 💻 Example
+
+```js
+fs.writeFile("test.txt", "Hello World", (err) => {
+  if (err) {
+    console.log(err);
+  }
+});
+```
+---
+# ⚡ 2. fs.writeFileSync() (Synchronous Method)
+📌 Theory
+`fs.writeFileSync()` is a synchronous (blocking) function.
+It blocks the execution until file writing is completed.
+
+👉 No other code runs until this operation finishes.
+
+**⚠️ Drawbacks**
+
+Slows down application
+
+Blocks event loop
+
+Not recommended in servers
+```js
+💻 Example
+fs.writeFileSync("test.txt", "Hello Sync");
+```
+---
+# 🚀 3. fsPromises.writeFile() (Modern Approach)
+**📌 Theory**
+
+This method is part of **fs/promises** module.
+It uses Promises and **async/await.**
+Provides cleaner and more readable code.
+
+👉 It is the recommended approach in modern Node.js applications.
+
+```js
+💻 Example
+const fs = require("fs/promises");
+
+await fs.writeFile("test.txt", "Hello Promise");
+```
+---
+
+**⚠️ Important Concept: Overwriting**
+
+All write methods:
+
+**`fs.writeFile()`**
+
+**`fs.writeFileSync()`**
+
+**`fsPromises.writeFile()`**
+
+
+👉 Overwrite existing content by default
+---
+
+
+# 4.✍️ Appending Data to Files
+**📌 Theory**
+
+Appending means adding new data to the end of a file without deleting existing content.
+
+👉 Useful for logs, notes, and history tracking.
+
+🔁 `fs.appendFile() (Asynchronous)`
+```js
+💻 Example
+fs.appendFile("test.txt", "\nNew Line", (err) => {
+  if (err) console.log(err);
+});
+🚀 fsPromises.appendFile() (Modern)
+const fs = require("fs/promises");
+
+await fs.appendFile("test.txt", "\nNew Line");
+```
+---
+## ⚖️ Write vs Append (Important Difference)
+
+| Operation  | Behavior                |
+|------------|------------------------|
+| writeFile  | Replaces old content   |
+| appendFile | Adds new content       |
+
+---
+
+### 🧠 Key Takeaways### 
+---
+**Use fs.writeFile() for basic async tasks**
+
+**Use fsPromises.writeFile() for modern apps**
+
+**Avoid writeFileSync() in production**
+
+**Use appendFile() to preserve data**
+
+**Understand overwrite vs append clearly**
+
+
+---
