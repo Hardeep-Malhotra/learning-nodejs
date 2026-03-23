@@ -978,3 +978,246 @@ Flags define how a file is opened.
 - `fsPromises.open()` → returns FileHandle object  
 - File descriptor is used to control file operations  
 - Closing the file using `close()` is mandatory  
+
+---
+# **6.📁 Working with Folders in Node.js**
+
+## 📌 Introduction
+
+Node.js provides a built-in module called **fs (File System)** that allows developers to interact with the file system. Using this module, we can create, read, update, rename, and delete files and folders.
+
+This README focuses on **working with folders (directories)** in Node.js using the `fs` module.
+
+---
+
+## 🧠 Why Folder Handling is Important
+
+Folder operations are widely used in real-world applications:
+
+* Storing uploaded files
+* Managing logs
+* Organizing project data
+* Creating dynamic directories
+* Backend file management in MERN apps
+
+---
+
+## ⚙️ Import Required Modules
+
+```js
+const fs = require('node:fs');
+const path = require('path');
+```
+
+---
+
+# 🔥 1. Check if Folder Exists
+
+## 📌 Method: `fs.existsSync()`
+
+### ✅ Description
+
+Checks whether a folder exists or not.
+
+### 💻 Example
+
+```js
+const folderPath = './test-folder';
+
+if (fs.existsSync(folderPath)) {
+  console.log("Folder exists");
+} else {
+  console.log("Folder does not exist");
+}
+```
+
+### 🧠 Key Points
+
+* Synchronous method
+* Returns `true` or `false`
+
+---
+
+# 🔥 2. Create a Folder
+
+## 📌 Method: `fs.mkdirSync()`
+
+### ✅ Description
+
+Creates a new folder.
+
+### 💻 Example
+
+```js
+if (!fs.existsSync(folderPath)) {
+  fs.mkdirSync(folderPath);
+  console.log("Folder created");
+}
+```
+
+### 🧠 Key Points
+
+* Creates a directory
+* Use condition check to avoid errors
+
+---
+
+# 🔥 3. Read Folder Contents
+
+## 📌 Method: `fs.readdirSync()`
+
+### ✅ Description
+
+Reads all files and folders inside a directory.
+
+### 💻 Example
+
+```js
+const files = fs.readdirSync('./');
+console.log(files);
+```
+
+### 🧠 Output Example
+
+```
+['file1.js', 'test-folder', 'index.js']
+```
+
+---
+
+# 🔥 4. Get Full Path of Files
+
+## 📌 Method: `path.join()`
+
+### ✅ Description
+
+Combines folder path with file names to generate full paths.
+
+### 💻 Example
+
+```js
+const fullPaths = fs.readdirSync('./').map(file => {
+  return path.join('./', file);
+});
+
+console.log(fullPaths);
+```
+
+### 🧠 Key Points
+
+* Avoids manual string concatenation
+* Cross-platform safe
+
+---
+
+# 🔥 5. Filter Only Files (Exclude Folders)
+
+## 📌 Method: `fs.lstatSync()`
+
+### ✅ Description
+
+Checks whether a path is a file or folder.
+
+### 💻 Example
+
+```js
+const onlyFiles = fs.readdirSync('./')
+  .map(file => path.join('./', file))
+  .filter(file => fs.lstatSync(file).isFile());
+
+console.log(onlyFiles);
+```
+
+### 🧠 Key Points
+
+* `isFile()` → returns true for files
+* `isDirectory()` → returns true for folders
+
+---
+
+# 🔥 6. Rename a Folder
+
+## 📌 Method: `fs.renameSync()`
+
+### ✅ Description
+
+Renames an existing folder.
+
+### 💻 Example
+
+```js
+fs.renameSync('./test-folder', './renamed-folder');
+```
+
+### 🧠 Key Points
+
+* First argument → old name
+* Second argument → new name
+
+---
+
+# 🔥 7. Delete a Folder
+
+## 📌 Method: `fs.rmSync()`
+
+### ✅ Description
+
+Deletes a folder (even if it contains files).
+
+### 💻 Example
+
+```js
+fs.rmSync('./test-folder', { recursive: true, force: true });
+```
+
+### 🧠 Key Points
+
+* `recursive: true` → deletes all contents
+* `force: true` → ignores errors if folder does not exist
+
+---
+
+# ⚠️ Important Notes
+
+* Always check before creating or deleting folders
+* Use try-catch for error handling in production
+* Prefer async methods in real-world applications
+
+---
+
+# 🔄 Sync vs Async Methods
+
+| Type    | Example     | Behavior        |
+| ------- | ----------- | --------------- |
+| Sync    | mkdirSync   | Blocking        |
+| Async   | mkdir       | Non-blocking    |
+| Promise | fs/promises | Modern approach |
+
+---
+
+# 🚀 Real World Use Cases
+
+* Upload folders in Express apps
+* File storage systems
+* Log management systems
+* Static file handling
+
+---
+
+# 🧾 Conclusion
+
+The Node.js `fs` module provides powerful methods to manage folders efficiently. By understanding these core operations, you can build scalable backend systems and handle file storage like a professional developer.
+
+---
+
+# 💡 Final Tip
+
+Practice each method individually, then combine them into a mini project like:
+
+👉 File Manager CLI Tool
+👉 Folder Organizer Script
+👉 File Upload Backend
+
+---
+
+🔥 **Now you are ready to handle folders like a pro in Node.js!**
