@@ -239,6 +239,136 @@ http://localhost:3000
 
 ---
 
+
+
+# 📘 Understanding Node.js Writable Streams & Backpressure
+
+## 🎯 Objective
+
+The goal of this project is to understand how **Node.js manages memory efficiently** when writing a **large amount of data (large files)** to a file using streams.
+
+---
+
+## 🚀 Concept: Backpressure
+
+When the **speed of writing data (write speed)** is slower than the **speed of generating data (process speed)**, extra data starts accumulating in **RAM (buffer)**.
+
+👉 This situation is called **Backpressure**.
+
+---
+
+## 🛠️ Key Components Used
+
+### 1. `writeStream.write(data)`
+
+This function returns a boolean:
+
+* ✅ `true` → Buffer has space, you can continue writing
+* ❌ `false` → Buffer is full (High Water Mark limit reached), you must pause
+
+---
+
+### 2. `drain` Event
+
+* When the buffer becomes full, Node.js continues writing data internally
+* Once the buffer is completely emptied, the **`drain` event** is triggered
+
+📌 **Important Note:**
+`drain` is emitted **only when the buffer was previously full**
+
+---
+
+### 3. High Water Mark
+
+* It is the default buffer size limit in streams
+* Usually: **16KB for Writable Streams**
+* If this limit is exceeded → backpressure is applied
+
+---
+
+## ⚙️ Logic Flow (How it Works)
+
+1. 🔁 Start writing data using a loop
+2. 🔍 After every `write()` call, check the return value
+3. ⏸️ If `false` → pause writing
+4. 👂 Wait for the `drain` event
+5. ▶️ Once triggered → resume writing
+
+---
+
+## 📈 Why is Backpressure Important?
+
+If you ignore backpressure and keep writing continuously:
+
+* ❌ **Memory Crash** → `JavaScript heap out of memory`
+* ❌ **System Slowdown / Hang**
+* ❌ **Poor Performance**
+
+---
+
+## 💻 Example Code
+
+```js
+const fs = require('node:fs');
+
+// Create a writable stream
+const writeStream = fs.createWriteStream('output.txt', {
+  encoding: 'utf-8',
+});
+
+let i = 0;
+const maxIterations = 100000; // Large data to fill buffer
+
+function writeData() {
+  let canWrite = true;
+
+  // Write until buffer is full or data ends
+  while (i < maxIterations && canWrite) {
+    const data = `Line number: ${i}\n`;
+
+    canWrite = writeStream.write(data);
+    i++;
+
+    if (!canWrite) {
+      // Buffer is full
+      console.log('⚠️ Buffer is full at index:', i);
+
+      // Wait for drain event, then resume
+      writeStream.once('drain', () => {
+        console.log('✅ Buffer drained! Resuming...');
+        writeData();
+      });
+    }
+  }
+
+  // When all data is written
+  if (i === maxIterations) {
+    writeStream.end();
+    console.log('🏁 All data written.');
+  }
+}
+
+// Start writing
+writeData();
+```
+
+---
+
+## 🧠 Summary
+
+* Node.js streams are designed for **efficient memory handling**
+* The return value of `write()` is **very important**
+* Always handle the `drain` event for large data
+* Backpressure handling is essential for **production-level applications**
+
+---
+
+
+
+
+
+
+
 ## 🎯 What You Learn
 
 After completing this module, you will:

@@ -1,30 +1,38 @@
-// FILE: 02_Writable_Stream.js
+const fs = require('node:fs');
 
-/**
- * Topic: Writable Stream in Node.js
- * Concepts: Writing data, finish event, error handling
- */
-
-const fs = require("node:fs");
-
-// Create Writable Stream
-const writer = fs.createWriteStream("output.txt", {
-  encoding: "utf-8",
+const writeStream = fs.createWriteStream('output.txt', {
+  encoding: 'utf-8',
 });
 
-// Write data in chunks
-writer.write("Hello Hardeep!\n");
-writer.write("Learning Writable Streams...\n");
+let i = 0;
+const maxIterations = 100000; // Zyada data taaki buffer bhar sake
 
-// End stream
-writer.end("Stream ended successfully!");
+function writeData() {
+  let canWrite = true;
 
-// Finish event
-writer.on("finish", () => {
-  console.log("✅ Writing completed successfully.");
-});
+  // Jab tak buffer mein jagah hai aur humara data baki hai
+  while (i < maxIterations && canWrite) {
+    const data = `Line number: ${i}\n`;
+    
+    canWrite = writeStream.write(data);
+    i++;
 
-// Error handling
-writer.on("error", (err) => {
-  console.error("❌ Error:", err.message);
-});
+    if (!canWrite) {
+      // Buffer bhar gaya!
+      console.log('⚠️ Buffer is full at index:', i);
+      
+      // 'drain' event ka wait karein, phir wapis start karein
+      writeStream.once('drain', () => {
+        console.log('✅ Buffer drained! Resuming...');
+        writeData(); 
+      });
+    }
+  }
+
+  if (i === maxIterations) {
+    writeStream.end();
+    console.log('🏁 All data written.');
+  }
+}
+
+writeData();
