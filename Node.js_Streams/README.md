@@ -521,6 +521,122 @@ node client.js
 
 ---
 
+
+# 📘 Node.js Transform Stream Example (Uppercase Converter)
+
+## 🎯 Objective
+
+The goal of this project is to understand how **Transform Streams** work in Node.js by converting user input into **uppercase text in real-time**.
+
+---
+
+## 🚀 Concept: Transform Stream
+
+A **Transform Stream** is a special type of stream that is:
+
+* 🔹 **Readable** → Outputs data
+* 🔹 **Writable** → Receives data
+* 🔹 **Transforms Data** → Modifies the input before passing it forward
+
+👉 It acts like a **middle layer** in a pipeline:
+
+```
+Input → Transform → Output
+```
+
+---
+
+## 🛠️ Key Idea
+
+* Input is taken from **`process.stdin`**
+* Data passes through a **Transform Stream**
+* Output is shown in **`process.stdout`**
+* The stream converts all text to **UPPERCASE**
+
+---
+
+## ⚙️ How It Works
+
+1. User types something in the terminal
+2. Input goes into the Transform stream
+3. `transform()` function modifies the data
+4. Output is displayed in uppercase
+
+---
+
+## 💻 Code Example
+
+```js id="transform001"
+const { Transform } = require('node:stream');
+
+// Create a Transform Stream
+const upperCaseTr = new Transform({
+  transform(chunk, encoding, callback) {
+    const upperData = chunk.toString().toUpperCase();
+
+    // Send transformed data forward
+    callback(null, upperData);
+  }
+});
+
+console.log("Type something to see the magic of Transform Stream:");
+
+
+// Pipe input → transform → output
+process.stdin
+  .pipe(upperCaseTr)
+  .pipe(process.stdout);
+```
+
+---
+
+## ▶️ How to Run
+
+```bash id="run001"
+node app.js
+```
+
+👉 Then type anything in the terminal — it will instantly convert to **UPPERCASE**.
+
+---
+
+## 📈 Key Learnings
+
+* Understanding **Transform Streams** in Node.js
+* How `.pipe()` creates a data pipeline
+* Real-time data transformation
+* Difference between:
+
+  * Readable Stream
+  * Writable Stream
+  * Transform Stream
+
+---
+
+## 🧠 Summary
+
+* Transform streams modify data **on the fly**
+* They are both **readable and writable**
+* Useful for:
+
+  * Data processing
+  * Compression
+  * Encryption
+  * Formatting
+
+---
+
+## 🚀 Future Improvements
+
+* Add lowercase → uppercase toggle
+* Add file transformation support
+* Build a text formatter CLI tool
+* Chain multiple transform streams
+
+---
+
+
+
 ## 🚀 Future Improvements
 
 * Add multiple client support
