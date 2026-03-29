@@ -655,6 +655,197 @@ node app.js
 
 ---
 
+# 📘 File Compression using Node.js Streams (Zlib + Pipe)
+
+## 🎯 Objective
+
+This project demonstrates how to efficiently **compress large files** in Node.js using **Streams and Zlib**, without loading the entire file into memory.
+
+---
+
+## 🚀 Core Concept
+
+Instead of reading the whole file at once (which can crash your app for large files), Node.js uses **Streams** to process data in **small chunks** and pass it through a pipeline.
+
+---
+
+## 🧩 Breakdown (Step-by-Step)
+
+### 1. `fs.createReadStream('input.txt')`
+
+**What is it?**
+A **Readable Stream**
+
+**What it does:**
+
+* Opens `input.txt`
+* Reads data in small chunks (usually ~64KB)
+* Does NOT load the full file into RAM
+
+**Benefit:**
+Even if the file is **1GB**, memory usage stays low
+
+---
+
+### 2. `zlib.createGzip()`
+
+**What is it?**
+A **Transform Stream**
+
+**What it does:**
+
+* Acts as a middle layer (filter)
+* Compresses each chunk using the **Gzip algorithm**
+
+**Why Transform?**
+Because it **modifies data** before passing it forward
+
+---
+
+### 3. `fs.createWriteStream('input.txt.gz')`
+
+**What is it?**
+A **Writable Stream**
+
+**What it does:**
+
+* Receives compressed data
+* Writes it into `input.txt.gz`
+
+---
+
+### 4. `.pipe()`
+
+**What it does:**
+
+* Connects streams together
+
+**Flow:**
+
+```id="flow001"
+Readable → Transform → Writable
+```
+
+**Why important?**
+
+* Automatically handles **Backpressure**
+* No need to manually manage buffer
+
+---
+
+### 5. `.on('finish', ...)`
+
+**What it does:**
+
+* Triggered when all data is:
+
+  * Read
+  * Compressed
+  * Written to file
+
+✅ Prints: `File successfully compressed`
+
+---
+
+## ⚙️ Compression Logic
+
+### 📦 File Compression using Streams
+
+* **Memory Efficient:**
+  Uses `createReadStream` to process data in chunks
+
+* **On-the-fly Compression:**
+  `zlib.createGzip()` compresses data instantly
+
+* **Automatic Backpressure Handling:**
+  `.pipe()` ensures smooth data flow without memory overflow
+
+---
+
+## 💻 Example Code
+
+```js id="gzip001"
+const fs = require('node:fs');
+const zlib = require('node:zlib');
+
+// Create streams
+const readStream = fs.createReadStream('input.txt');
+const gzip = zlib.createGzip();
+const writeStream = fs.createWriteStream('input.txt.gz');
+
+// Pipe streams together
+readStream
+  .pipe(gzip)
+  .pipe(writeStream)
+  .on('finish', () => {
+    console.log('✅ File successfully compressed');
+  });
+```
+
+---
+
+## ▶️ How to Run
+
+```bash id="run002"
+node app.js
+```
+
+👉 Make sure `input.txt` exists in the same folder
+
+---
+
+## 🔄 Decompression Tip
+
+To **unzip (decompress)** the file:
+
+* Replace:
+
+```js id="replace001"
+zlib.createGzip()
+```
+
+* With:
+
+```js id="replace002"
+zlib.createGunzip()
+```
+
+* Change file names accordingly
+
+---
+
+## 📈 Key Learnings
+
+* Streams help in **handling large files efficiently**
+* Transform streams allow **real-time data modification**
+* `.pipe()` simplifies stream chaining and manages backpressure
+* Zlib provides built-in **compression utilities**
+
+---
+
+## 🧠 Summary
+
+* Readable → reads data in chunks
+* Transform → compresses data
+* Writable → saves output
+* Pipe → connects everything smoothly
+
+👉 This pattern is widely used in **real-world systems** for:
+a
+* File uploads/downloads
+* Data processing pipelines
+* Compression tools
+
+---
+
+## 🚀 Future Improvements
+
+* Add file decompression script
+* Combine compression + encryption
+* Build CLI tool for file compression
+* Add progress tracking
+
+---
 
 
 
