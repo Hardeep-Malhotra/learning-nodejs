@@ -354,6 +354,182 @@ writeData();
 
 ---
 
+
+
+
+# 📘 Node.js TCP Server & Client using Net Module (Duplex Streams)
+
+## 🎯 Objective
+
+The purpose of this project is to understand how **TCP communication works in Node.js** using the built-in **`net` module**, and how **Duplex Streams** allow both reading and writing of data.
+
+---
+
+## 🚀 Concept: Duplex Streams
+
+A **Duplex Stream** is a stream that is both:
+
+* 🔹 **Readable** → Can receive data
+* 🔹 **Writable** → Can send data
+
+👉 In this project, the **socket** is a duplex stream:
+
+* Reads data from client/server
+* Writes data to client/server
+
+---
+
+## 🛠️ Technologies Used
+
+* Node.js
+* `net` module (built-in TCP networking)
+
+---
+
+## 📡 How It Works
+
+### 🔹 Server Side
+
+* Creates a TCP server using `net.createServer()`
+* Listens for incoming client connections
+* Reads data sent by the client
+* Sends responses using terminal input (`stdin`)
+* Handles disconnection and errors
+
+---
+
+### 🔹 Client Side
+
+* Connects to the server using `net.createConnection()`
+* Sends an initial message to the server
+* Listens for server responses
+* Handles disconnection and errors
+
+---
+
+## ⚙️ Flow of Communication
+
+1. Server starts and listens on port **3000**
+2. Client connects to the server
+3. Client sends a message → Server receives it
+4. Server replies via terminal input → Client receives it
+5. Both can communicate continuously (real-time)
+
+---
+
+## 💻 Server Code
+
+```js id="server001"
+const net = require('node:net');
+
+// Create a TCP server
+const server = net.createServer((socket) => {
+  console.log('--- New Client Connected ---');
+
+  // READABLE: Receive data from client
+  socket.on('data', (data) => {
+    console.log('\nClient says:', data.toString().trim());
+    process.stdout.write('Your Reply: ');
+  });
+
+  // WRITABLE: Send data to client via terminal input
+  process.stdout.write('Your Reply: ');
+  process.stdin.pipe(socket);
+
+  // Handle client disconnection
+  socket.on('end', () => {
+    console.log('\n--- Client Disconnected ---');
+  });
+
+  // Error handling
+  socket.on('error', (err) => {
+    console.log('Socket Error:', err.message);
+  });
+});
+
+// Start server
+server.listen(3000, () => {
+  console.log('Server is listening on port 3000...');
+});
+```
+
+---
+
+## 💻 Client Code
+
+```js id="client001"
+const net = require('node:net');
+
+// Connect to server
+const client = net.createConnection({ port: 3000 }, () => {
+  console.log('✅ Connected to Server!');
+  
+  // Send initial message
+  client.write('Hello from Hardeep!');
+});
+
+// Receive data from server
+client.on('data', (data) => {
+  console.log('\nServer replied:', data.toString().trim());
+});
+
+// Handle disconnection
+client.on('end', () => {
+  console.log('❌ Disconnected from server');
+});
+
+// Error handling
+client.on('error', (err) => {
+  console.error('Connection Error:', err.message);
+});
+```
+
+---
+
+## ▶️ How to Run
+
+### 1️⃣ Start Server
+
+```bash
+node server.js
+```
+
+### 2️⃣ Start Client (in another terminal)
+
+```bash
+node client.js
+```
+
+---
+
+## 📈 Key Learnings
+
+* Understanding **TCP communication** in Node.js
+* Working with **Duplex Streams**
+* Difference between **Readable & Writable streams**
+* Real-time communication between server and client
+* Handling **events** like `data`, `end`, and `error`
+
+---
+
+## 🧠 Summary
+
+* `net` module helps build low-level network applications
+* `socket` acts as a **Duplex Stream**
+* You can both **read and write data simultaneously**
+* Useful for building **chat apps, real-time systems, and custom protocols**
+
+---
+
+## 🚀 Future Improvements
+
+* Add multiple client support
+* Build a simple chat application
+* Add username system
+* Implement message broadcasting
+
+---
+
 ## 🧠 Summary
 
 * Node.js streams are designed for **efficient memory handling**
